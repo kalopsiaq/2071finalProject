@@ -2,7 +2,6 @@ import numpy as np
 import wave
 import serial
 
-# --- Config ---
 PORT = 'COM5'          # Change to your STM's port (e.g. '/dev/ttyACM0' on Linux/Mac)
 BAUD_RATE = 115200
 SAMPLE_RATE = 10000
