@@ -1,0 +1,45 @@
+import serial
+import time
+
+ser = serial.Serial('COM3', 921600, timeout=1)
+ser.reset_input_buffer()
+
+N = 512
+HALF = N // 2
+PACKED_SIZE = (HALF * 3) // 2
+
+count = 0
+samples = []
+
+start = time.time()
+
+while time.time() - start < 5:
+    if ser.read(1) != b'\xAA':
+        continue
+    if ser.read(1) != b'\x55':
+        continue
+
+    raw = ser.read(PACKED_SIZE)
+
+    if len(raw) != PACKED_SIZE:
+        continue
+
+    for i in range(0, PACKED_SIZE, 3):
+        b0 = raw[i]
+        b1 = raw[i + 1]
+        b2 = raw[i + 2]
+
+        a = b0 | ((b1 & 0x0F) << 8)
+        b = ((b1 >> 4) & 0x0F) | (b2 << 4)
+
+        samples.append(a)
+        samples.append(b)
+
+    count += HALF
+
+end = time.time()
+
+print("Time:", end - start)
+print("Samples:", count)
+print("Sample rate:", count / (end - start))
+print("First 20 samples:", samples[:20])
